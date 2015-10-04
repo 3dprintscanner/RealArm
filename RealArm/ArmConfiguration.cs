@@ -17,5 +17,10 @@ namespace RealArm
         }
 
         public decimal QuantizeStep { get; set; }
+
+        public void SetMinMax(IList<Tuple<decimal,decimal>> minMax)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

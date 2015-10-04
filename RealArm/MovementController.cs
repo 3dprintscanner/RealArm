@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 
 namespace RealArm
 {
-    public class MovementController : IMovementController
+    public class MovementController : MovementControllerBase
     {
 
         public IArm arm { get; set; }
         public ISensor sensor { get; set; }
+        private bool moveInProgress = true;
           
 
         public IArmConfiguration ArmConfiguration { get; set; }
@@ -25,14 +26,27 @@ namespace RealArm
         
         }
 
-        protected void OnMoveComplete(object sender, MoveEventArgs e) { }
-
-        public void Listen()
+        protected void OnMoveComplete(object sender, EventArgs e)
         {
-            
+            // free the move in progress to allow another movement
+            this.moveInProgress = false;
         }
 
-        public void UnListen()
+
+        protected void OnStopReached(object sender, EventArgs e) 
+        {
+            // the stop has been reached, give an error??? do not allow the arm to move further in one direction
+        }
+
+
+
+        public override void Listen()
+        {
+            // attach the arm to the PXCM sensor
+            throw new NotImplementedException();
+        }
+
+        public override void UnListen()
         {
             throw new NotImplementedException();
         }

@@ -1,1 +1,6 @@
 c:\users\3dstation\documents\visual studio 2012\Projects\RealArm\RealArm\obj\Debug\RealArm.csprojResolveAssemblyReference.cache
+C:\Users\3dstation\Documents\Visual Studio 2012\Projects\RealArm\RealArm\bin\Debug\RealArm.dll
+C:\Users\3dstation\Documents\Visual Studio 2012\Projects\RealArm\RealArm\bin\Debug\RealArm.pdb
+C:\Users\3dstation\Documents\Visual Studio 2012\Projects\RealArm\RealArm\bin\Debug\LibUsbDotNet.dll
+C:\Users\3dstation\Documents\Visual Studio 2012\Projects\RealArm\RealArm\obj\Debug\RealArm.dll
+C:\Users\3dstation\Documents\Visual Studio 2012\Projects\RealArm\RealArm\obj\Debug\RealArm.pdb

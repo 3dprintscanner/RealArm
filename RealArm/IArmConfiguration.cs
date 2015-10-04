@@ -15,7 +15,7 @@ namespace RealArm
         // set a quantization rate for the movement commands
 
         decimal[] XYZThreshold { get; set; }
-        void SetMinMax(Tuple[] minMax);
+        void SetMinMax(IList<Tuple<decimal, decimal>> minMax);
         decimal QuantizeStep{get; set;}
         
     }
