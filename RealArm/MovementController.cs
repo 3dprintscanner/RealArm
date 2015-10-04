@@ -36,6 +36,7 @@ namespace RealArm
         protected void OnMoveComplete(object sender, EventArgs e)
         {
             // free the move in progress to allow another movement
+            
             this.moveInProgress = false;
         }
 
@@ -43,6 +44,7 @@ namespace RealArm
         protected void OnStopReached(object sender, EventArgs e) 
         {
             // the stop has been reached, give an error??? do not allow the arm to move further in one direction
+            throw new EndOfMovementRangeException();
         }
 
 
