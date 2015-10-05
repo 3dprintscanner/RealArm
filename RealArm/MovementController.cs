@@ -7,7 +7,7 @@ using TestOwi535;
 
 namespace RealArm
 {
-    public class MovementController : MovementControllerBase
+    public class MovementController : MovementControllerBase, IDisposable
     {
 
         public IArm arm { get; set; }
@@ -15,6 +15,8 @@ namespace RealArm
         public PXCMSession Session;
         private bool _moveInProgress = false;
         private bool gripperOpen = true;
+        public bool armActive = false;
+        public bool sensorActive = false;
         private RobotArm _robotArm;
         private int _frameCounter = 25;
         private int _currentFrame;
@@ -29,11 +31,12 @@ namespace RealArm
 
         public IArmConfiguration ArmConfiguration { get; set; }
 
-        public MovementController(IArm arm)
+        public MovementController(PXCMSession session, PXCMSenseManager.Handler handler)
         {
-            this.arm = arm;
-
+            
             // register event handlers
+            this.Session = session;
+            this._handler = handler;
             arm.MoveComplete += OnMoveComplete;
             arm.StopReached += OnStopReached;
             BlinkLight();
@@ -72,13 +75,7 @@ namespace RealArm
         public override void Listen()
         {
             // attach the controller to the PXCM sensor
-            _senseManager = Session.CreateSenseManager();
-            _handler = new PXCMSenseManager.Handler
-            {
-                onModuleProcessedFrame = OnModuleProcessedFrame,
-                onConnect = OnConnect
-            };
-            _handler.onModuleProcessedFrame = OnModuleProcessedFrame;
+            _senseManager = Session.CreateSenseManager();      
             _senseManager.EnableHand();
             _handModule = _senseManager.QueryHand();
             _handData = _handModule.CreateOutput();
@@ -86,7 +83,8 @@ namespace RealArm
             _handConfiguration.SubscribeGesture(OnGestureReceived);
             _handConfiguration.SubscribeAlert(OnAlertReceived);
             _senseManager.Init();
-            
+            sensorActive = true;
+
         }
 
         private void OnAlertReceived(PXCMHandData.AlertData alertData)
@@ -94,43 +92,19 @@ namespace RealArm
             
         }
 
-        private pxcmStatus OnConnect(PXCMCapture.Device device, bool connected)
-        {
-            if (connected)
-            {
-                Console.WriteLine("Device Connected");
-                return pxcmStatus.PXCM_STATUS_NO_ERROR;
-            }
-            return pxcmStatus.PXCM_STATUS_DEVICE_FAILED;
-            
-        }
-
-        private pxcmStatus OnModuleProcessedFrame(int mid, PXCMBase module, PXCMCapture.Sample sample)
-        {
-            _currentFrame++;
-            if (_currentFrame % _frameCounter != 0 && !_moveInProgress) return pxcmStatus.PXCM_STATUS_NO_ERROR;
-            _currentFrame = 0;
-            _handData.Update();
-            Int32 handId;
-            _handData.QueryHandId(PXCMHandData.AccessOrderType.ACCESS_ORDER_NEAR_TO_FAR, 0, out handId);
-            _handData.QueryHandDataById(handId, out _iHand);
-            var currentHandPosition = _iHand.QueryMassCenterWorld();
-            AssertArmMovement(_referencePosition,currentHandPosition);
-            _referencePosition = currentHandPosition;
-            return pxcmStatus.PXCM_STATUS_NO_ERROR;
-
-        }
-
         public override void UnListen()
         {
-            
+            _senseManager.Close();
+            _senseManager = null;
+            sensorActive = false;
         }
 
         public override void ActivateActuator()
         {
             _robotArm = new RobotArm();
             _robotArm.moveToZero();
-            
+            armActive = true;
+
         }
 
         public override void DeactivateActuator()
@@ -138,6 +112,7 @@ namespace RealArm
             _robotArm.moveToZero();
             _robotArm.close();
             _robotArm = null;
+            armActive = false;
         }
 
         private void BlinkLight()
@@ -149,6 +124,7 @@ namespace RealArm
 
         private void AssertArmMovement(PXCMPoint3DF32 referencePosition, PXCMPoint3DF32 handPosition)
         {
+            if (armActive) return;
             // calculate the difference between the processed frames and move the arm if a threshold for sensitivity is reached
             var xDifference = (int) Math.Ceiling(handPosition.x - referencePosition.x);
             var yDifference = (int) Math.Ceiling(handPosition.y - referencePosition.y);
@@ -161,5 +137,14 @@ namespace RealArm
             }
         }
 
+        public void Dispose()
+        {
+            if (_senseManager != null)
+            {
+                _senseManager.Close();
+                _senseManager = null;
+                Session = null;
+            }
+        }
     }
 }

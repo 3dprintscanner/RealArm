@@ -3,6 +3,11 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="MainWindow" Height="350" Width="525">
     <Grid>
-        
+        <StackPanel HorizontalAlignment="Left" Height="299" Margin="10,10,0,0" VerticalAlignment="Top" Width="497">
+            <Image x:Name="imgColourStream" Height="197"/>
+            <Button x:Name="sensorbutton" Content="Activate Realsense" Margin="0,0,394,0" Click="sensorbutton_Click"/>
+            <Button x:Name="armbutton" Content="Activate Arm" Margin="0,0,394,0" RenderTransformOrigin="2.65,-0.05" Click="armbutton_Click"/>
+        </StackPanel>
+
     </Grid>
 </Window>
