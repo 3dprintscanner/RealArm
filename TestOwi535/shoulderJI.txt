@@ -1,0 +1,3 @@
+rotate: 13000
+limits: 110 -90
+angle: 0

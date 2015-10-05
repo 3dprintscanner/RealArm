@@ -1,0 +1,3 @@
+rotate: 15300
+limits: 135 -135
+angle: 0

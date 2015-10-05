@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -26,6 +27,10 @@ namespace RealArmFrontEnd
         public PXCMSession Session;
         private PXCMImage.ImageData colorData = null;
         private Bitmap colourBitMap;
+        private Thread thread;
+        private int frameCounter = 0;
+        private bool calibrated = false;
+        private string labelContent;
         
         public MainWindow()
         {
@@ -35,9 +40,29 @@ namespace RealArmFrontEnd
             {
                 onModuleProcessedFrame = OnModuleProcessedFrame,
                 onNewSample = OnNewSample
-
-            });
+            },
+            handGestureHandler: OnFiredGesture,
+            handAlertHandler:OnFiredAlert);
             
+            
+        }
+
+        private void OnFiredGesture(PXCMHandData.GestureData gesturedata)
+        {
+            throw new NotImplementedException();
+        }
+
+        private void OnFiredAlert(PXCMHandData.AlertData alertData)
+        {          
+            if (alertData.label == PXCMHandData.AlertType.ALERT_HAND_CALIBRATED) calibrated = true;
+           
+        }
+
+        private void startStream()
+        {
+
+                _movementController.Listen();
+
         }
 
         private pxcmStatus OnNewSample(int mid, PXCMCapture.Sample sample)
@@ -47,6 +72,7 @@ namespace RealArmFrontEnd
              out colorData);
             colourBitMap = colorData.ToBitmap(0, sample.color.info.width, sample.color.info.height);
             UpdateUI(colourBitMap);
+            _sample.color.ReleaseAccess(colorData);
             return pxcmStatus.PXCM_STATUS_NO_ERROR;
         }
 
@@ -69,20 +95,35 @@ namespace RealArmFrontEnd
 
         private pxcmStatus OnModuleProcessedFrame(int mid, PXCMBase module, PXCMCapture.Sample sample)
         {
-            // use this sample to render the video frame in the window
+            // use this sample to work on the hand data.
+            if (calibrated == true)
+            {
+                frameCounter++;
+                if (frameCounter % 25 == 0)
+                {
+                    var position = _movementController.GetHandPosition();
+                    handPosition.Content = position;
+                    frameCounter = 0;                
+                }
+
+            }
             return pxcmStatus.PXCM_STATUS_NO_ERROR;
         }
 
+    
         private void sensorbutton_Click(object sender, RoutedEventArgs e)
         {
             // activate the realsense sensor
+           
             if (!_movementController.sensorActive)
             {
-                _movementController.Listen();
+                thread = new Thread(startStream);
+                thread.Start();
             }
             else
             {
-                _movementController.UnListen();
+                thread.Abort();
+                sensorbutton.Content = "Activate Sensor";
             }
             
             

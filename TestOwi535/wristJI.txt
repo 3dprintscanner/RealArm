@@ -1,0 +1,3 @@
+rotate: 7400
+limits: 60 -60
+angle: 0
