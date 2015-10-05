@@ -10,7 +10,7 @@ namespace RealArm
     {
         IArmConfiguration ArmConfiguration { get; set; }
         decimal[] Positions { get; set; }
-        bool canMoveTo(decimal[] position);
+        bool CanMoveTo(decimal[] position);
         void Move(decimal[] movement);
         void Grab();
         void Release();

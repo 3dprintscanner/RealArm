@@ -33,8 +33,8 @@ namespace RealArm
 
         delegate void MoveEventHandler (object sender, MoveEventArgs e);
 
-        MoveEventHandler OnMoveComplete;
-        MoveEventHandler OnStopReached;
+        MoveEventHandler _onMoveComplete;
+        MoveEventHandler _onStopReached;
 
 
     }

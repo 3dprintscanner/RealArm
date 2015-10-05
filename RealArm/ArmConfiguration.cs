@@ -8,12 +8,12 @@ namespace RealArm
 {
     public class ArmConfiguration : IArmConfiguration
     {
-        public decimal[] XYZThreshold { get; set; }
-        private IList<Tuple<decimal,decimal>> minMax;
+        public decimal[] XyzThreshold { get; set; }
+        private IList<Tuple<decimal,decimal>> _minMax;
 
         public void SetMinMax(string axis, IList<Tuple<decimal, decimal>> minMax)
         {
-            this.minMax = minMax;
+            this._minMax = minMax;
         }
 
         public decimal QuantizeStep { get; set; }

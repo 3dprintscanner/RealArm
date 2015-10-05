@@ -14,7 +14,7 @@ namespace RealArm
         // set minimum and maximum values for displacement as time in seconds of movement
         // set a quantization rate for the movement commands
 
-        decimal[] XYZThreshold { get; set; }
+        decimal[] XyzThreshold { get; set; }
         void SetMinMax(IList<Tuple<decimal, decimal>> minMax);
         decimal QuantizeStep{get; set;}
         

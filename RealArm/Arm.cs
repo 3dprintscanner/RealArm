@@ -32,7 +32,7 @@ namespace RealArm
             }
         }
 
-        public bool canMoveTo(decimal[] position)
+        public bool CanMoveTo(decimal[] position)
         {
             throw new NotImplementedException();
         }
