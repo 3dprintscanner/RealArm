@@ -23,7 +23,7 @@ namespace RealArmFrontEnd
     /// </summary>
     public partial class MainWindow : Window
     {
-        private MovementController _movementController;
+        private readonly MovementController _movementController;
         public PXCMSession Session;
         private PXCMImage.ImageData colorData = null;
         private Bitmap colourBitMap;
@@ -41,8 +41,8 @@ namespace RealArmFrontEnd
                 onModuleProcessedFrame = OnModuleProcessedFrame,
                 onNewSample = OnNewSample
             },
-            handGestureHandler: OnFiredGesture,
-            handAlertHandler:OnFiredAlert);
+            OnFiredGesture,
+            OnFiredAlert);
             
             
         }
@@ -101,8 +101,13 @@ namespace RealArmFrontEnd
                 frameCounter++;
                 if (frameCounter % 25 == 0)
                 {
-                    var position = _movementController.GetHandPosition();
-                    handPosition.Content = position;
+                    
+                    this.Dispatcher.Invoke((Action) (() =>
+                    {
+                        var position = _movementController.GetHandPosition();
+                        handPosition.Content = position;
+                    }));
+                    
                     frameCounter = 0;                
                 }
 
@@ -117,7 +122,7 @@ namespace RealArmFrontEnd
            
             if (!_movementController.sensorActive)
             {
-                thread = new Thread(startStream);
+                thread = new Thread(new ThreadStart(startStream));
                 thread.Start();
             }
             else
