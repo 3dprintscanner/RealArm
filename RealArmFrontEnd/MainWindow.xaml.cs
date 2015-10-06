@@ -49,7 +49,10 @@ namespace RealArmFrontEnd
 
         private void OnFiredGesture(PXCMHandData.GestureData gesturedata)
         {
-            throw new NotImplementedException();
+            if (gesturedata.name == "full_pinch")
+            {
+                _movementController.ActivateGripper();
+            }
         }
 
         private void OnFiredAlert(PXCMHandData.AlertData alertData)
@@ -99,19 +102,20 @@ namespace RealArmFrontEnd
             if (calibrated == true)
             {
                 frameCounter++;
-                if (frameCounter % 25 == 0)
+                if (frameCounter % 100 == 0)
                 {
                     
-                    this.Dispatcher.Invoke((Action) (() =>
+                    this.Dispatcher.Invoke((() =>
                     {
                         var position = _movementController.GetHandPosition();
                         handPosition.Content = position;
                     }));
-                    
+                    _movementController.AssertArmMovement();   
                     frameCounter = 0;                
                 }
-
             }
+
+            
             return pxcmStatus.PXCM_STATUS_NO_ERROR;
         }
 
@@ -145,6 +149,16 @@ namespace RealArmFrontEnd
             {
                 _movementController.DeactivateActuator();
             }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            _movementController.ZeroArm();
+        }
+
+        private void MoveArm_Click(object sender, RoutedEventArgs e)
+        {
+            _movementController.TestMove();
         }
     }
 }

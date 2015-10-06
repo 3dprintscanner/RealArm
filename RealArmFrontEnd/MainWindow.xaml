@@ -7,7 +7,9 @@
             <Image x:Name="imgColourStream" Height="197"/>
             <Button x:Name="sensorbutton" Content="Activate Realsense" Margin="0,0,394,0" Click="sensorbutton_Click"/>
             <Button x:Name="armbutton" Content="Activate Arm" Margin="0,0,394,0" RenderTransformOrigin="2.65,-0.05" Click="armbutton_Click"/>
-            <Label x:Name="handPosition" Content="Label"/>
+            <Label x:Name="handPosition" Content="Label" Margin="0,0,276,0"/>
+            <Button x:Name="MoveArm" Content="Move Arm" Margin="0,0,394,0" Click="MoveArm_Click"/>
+            <Button Content="Zero Arm" Margin="0,0,394,0" Click="Button_Click"/>
         </StackPanel>
 
     </Grid>
