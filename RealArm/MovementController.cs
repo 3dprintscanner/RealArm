@@ -20,7 +20,6 @@ namespace RealArm
         private RobotArm _robotArm;
         private int _frameCounter = 25;
         private int _currentFrame;
-        private PXCMPoint3DF32 _referencePosition;
         private PXCMHandConfiguration _handConfiguration;
         private PXCMHandModule _handModule;
         private PXCMSenseManager _senseManager;
@@ -34,18 +33,16 @@ namespace RealArm
 
         public IArmConfiguration ArmConfiguration { get; set; }
 
-        public MovementController(PXCMSession session, PXCMSenseManager.Handler handler,
+        public MovementController(PXCMSenseManager.Handler handler,
             PXCMHandConfiguration.OnFiredGestureDelegate handGestureHandler,
             PXCMHandConfiguration.OnFiredAlertDelegate handAlertHandler)
         {
             
             // register event handlers
-            this.Session = session;
             this._handler = handler;
             _handGestureHandler = handGestureHandler;
             _handAlertHandler = handAlertHandler;
             Session = PXCMSession.CreateInstance();
-            _referencePosition = new PXCMPoint3DF32(0.0f,0.0f,0.0f);
         
         }
 
@@ -87,16 +84,11 @@ namespace RealArm
 
         }
 
-        private void OnAlertReceived(PXCMHandData.AlertData alertData)
-        {
-            Console.WriteLine("Alert recieved");
-        }
-
         public string GetHandPosition()
         {
-            PXCMPoint3DF32 handLocation = GetHandPXCMPoint32();
-            return String.Format("X={0}, Y={1}, Z={2}", (handLocation.x*1000).ToString(), (handLocation.y*1000).ToString(),
-                (handLocation.z*1000).ToString());
+            Coord3D handLocation = GetTransformPosition(GetHandPXCMPoint32());
+            return String.Format("X={0}, Y={1}, Z={2}", (handLocation.X), (handLocation.Y),
+                (handLocation.Z));
         }
 
         private PXCMPoint3DF32 GetHandPXCMPoint32()
@@ -125,6 +117,7 @@ namespace RealArm
             if (_moveInProgress || !armActive) return;
             _robotArm.openGripper(!gripperOpen);
             gripperOpen = !gripperOpen;
+            BlinkLight();
         }
 
         public override void UnListen()
@@ -173,11 +166,17 @@ namespace RealArm
         private Coord3D GetTransformPosition(PXCMPoint3DF32 handPosition)
         {
             // x +- 0.25, y +- 0.15 z =0.2- 0.6
-            // 
+            // The limits of the system will be determined by the length of the two arm bones and the angle of the base, the range of vertical motion of the base
+            // The Z height limit will be maximum of the arm length and minimum of the length of the forearm and hand.
+            // The co-ordinates are positive
+            // e.g x+0.25 *maxlengthX and so forth.
+
+            // 300,300,150
+
             
-            handPosition.x *= 1000;
-            handPosition.y *= 2000;
-            handPosition.z *= 250;
+            handPosition.x = (handPosition.x + 0.25f)*(300/0.25f);
+            handPosition.y *= (handPosition.y + 0.15f) * (300 / 0.15f);
+            handPosition.z *= (handPosition.z) * (150 / 0.55f);
             return new Coord3D((int)Math.Ceiling(handPosition.x),(int)Math.Ceiling(handPosition.y),(int)Math.Ceiling(handPosition.z));
         }
 

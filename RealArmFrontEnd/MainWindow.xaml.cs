@@ -35,8 +35,7 @@ namespace RealArmFrontEnd
         public MainWindow()
         {
             InitializeComponent();
-            Session = PXCMSession.CreateInstance();
-            _movementController = new MovementController(Session, new PXCMSenseManager.Handler
+            _movementController = new MovementController(new PXCMSenseManager.Handler
             {
                 onModuleProcessedFrame = OnModuleProcessedFrame,
                 onNewSample = OnNewSample
@@ -63,9 +62,7 @@ namespace RealArmFrontEnd
 
         private void startStream()
         {
-
                 _movementController.Listen();
-
         }
 
         private pxcmStatus OnNewSample(int mid, PXCMCapture.Sample sample)
@@ -133,10 +130,7 @@ namespace RealArmFrontEnd
             {
                 thread.Abort();
                 sensorbutton.Content = "Activate Sensor";
-            }
-            
-            
-
+            }                      
         }
 
         private void armbutton_Click(object sender, RoutedEventArgs e)
