@@ -24,12 +24,11 @@ namespace RealArmFrontEnd
     public partial class MainWindow : Window
     {
         private readonly MovementController _movementController;
-        public PXCMSession Session;
         private PXCMImage.ImageData colorData = null;
         private Bitmap colourBitMap;
         private Thread thread;
         private int frameCounter = 0;
-        private bool calibrated = false;
+        private bool calibrated;
         private string labelContent;
         
         public MainWindow()
@@ -42,22 +41,88 @@ namespace RealArmFrontEnd
             },
             OnFiredGesture,
             OnFiredAlert);
-            
-            
+            calibrated = false;
+
+
         }
 
-        private void OnFiredGesture(PXCMHandData.GestureData gesturedata)
+        private void OnFiredGesture(PXCMHandData.GestureData gestureData)
         {
-            if (gesturedata.name == "full_pinch")
+            switch (gestureData.state)
+            {
+                case PXCMHandData.GestureStateType.GESTURE_STATE_START:
+                    break;
+                case PXCMHandData.GestureStateType.GESTURE_STATE_IN_PROGRESS:
+                    break;
+                case PXCMHandData.GestureStateType.GESTURE_STATE_END:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            if (gestureData.name == "full_pinch")
             {
                 _movementController.ActivateGripper();
+            }
+            if (gestureData.name == "thumb_up")
+            {
+                _movementController.BlinkLight();
             }
         }
 
         private void OnFiredAlert(PXCMHandData.AlertData alertData)
-        {          
-            if (alertData.label == PXCMHandData.AlertType.ALERT_HAND_CALIBRATED) calibrated = true;
-           
+        {
+            switch (alertData.label)
+            {
+                case PXCMHandData.AlertType.ALERT_HAND_DETECTED:
+                    calibrated = true;
+                    break;
+                case PXCMHandData.AlertType.ALERT_HAND_NOT_DETECTED:
+                    calibrated = false;
+                    break;
+                case PXCMHandData.AlertType.ALERT_HAND_TRACKED:
+                    calibrated = true;
+                    break;
+                case PXCMHandData.AlertType.ALERT_HAND_NOT_TRACKED:
+                    calibrated = false;
+                    break;
+                case PXCMHandData.AlertType.ALERT_HAND_CALIBRATED:
+                    calibrated = true;
+                    break;
+                case PXCMHandData.AlertType.ALERT_HAND_NOT_CALIBRATED:
+                    calibrated = false;
+                    break;
+                case PXCMHandData.AlertType.ALERT_HAND_OUT_OF_BORDERS:
+                    calibrated = false;
+                    break;
+                case PXCMHandData.AlertType.ALERT_HAND_INSIDE_BORDERS:
+                    calibrated = true;
+                    break;
+                case PXCMHandData.AlertType.ALERT_HAND_OUT_OF_LEFT_BORDER:
+                    calibrated = false;
+                    break;
+                case PXCMHandData.AlertType.ALERT_HAND_OUT_OF_RIGHT_BORDER:
+                    calibrated = false;
+                    break;
+                case PXCMHandData.AlertType.ALERT_HAND_OUT_OF_TOP_BORDER:
+                    calibrated = false;
+                    break;
+                case PXCMHandData.AlertType.ALERT_HAND_OUT_OF_BOTTOM_BORDER:
+                    calibrated = false;
+                    break;
+                case PXCMHandData.AlertType.ALERT_HAND_TOO_FAR:
+                    calibrated = false;
+                    break;
+                case PXCMHandData.AlertType.ALERT_HAND_TOO_CLOSE:
+                    calibrated = false;
+                    break;
+                case PXCMHandData.AlertType.ALERT_HAND_LOW_CONFIDENCE:
+                    calibrated = false;
+                    break;
+                default:
+                    calibrated = false;
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         private void startStream()
@@ -96,19 +161,18 @@ namespace RealArmFrontEnd
         private pxcmStatus OnModuleProcessedFrame(int mid, PXCMBase module, PXCMCapture.Sample sample)
         {
             // use this sample to work on the hand data.
-            if (calibrated == true)
+            if (calibrated)
             {
                 frameCounter++;
                 if (frameCounter % 100 == 0)
                 {
-                    
                     this.Dispatcher.Invoke((() =>
                     {
                         var position = _movementController.GetHandPosition();
                         handPosition.Content = position;
                     }));
-                    _movementController.AssertArmMovement();   
-                    frameCounter = 0;                
+                    _movementController.AssertArmMovement();
+                    frameCounter = 0;                                                   
                 }
             }
 
@@ -153,6 +217,16 @@ namespace RealArmFrontEnd
         private void MoveArm_Click(object sender, RoutedEventArgs e)
         {
             _movementController.TestMove();
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            //deregister event handlers
+
+
+            thread.Abort();
+            _movementController.Dispose();
+            colourBitMap.Dispose();
         }
     }
 }

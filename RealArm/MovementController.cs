@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using TestOwi535;
 
@@ -75,6 +76,7 @@ namespace RealArm
             _handConfiguration.EnableAlert(PXCMHandData.AlertType.ALERT_HAND_TRACKED);
             _handConfiguration.EnableAlert(PXCMHandData.AlertType.ALERT_HAND_CALIBRATED);
             _handConfiguration.EnableGesture("full_pinch");
+            _handConfiguration.EnableGesture("thumb_up");
             _handConfiguration.ApplyChanges();
             _senseManager.Init(_handler);
             sensorActive = true;
@@ -86,9 +88,18 @@ namespace RealArm
 
         public string GetHandPosition()
         {
-            Coord3D handLocation = GetTransformPosition(GetHandPXCMPoint32());
-            return String.Format("X={0}, Y={1}, Z={2}", (handLocation.X), (handLocation.Y),
-                (handLocation.Z));
+            try
+            {
+                Coord3D handLocation = GetTransformPosition(GetHandPXCMPoint32());
+                return String.Format("X={0}, Y={1}, Z={2}", (handLocation.X), (handLocation.Y),
+                    (handLocation.Z));
+            }
+            catch (HandNotFoundException exception)
+            {
+                return "Hand Not Found";
+
+            }
+            
         }
 
         private PXCMPoint3DF32 GetHandPXCMPoint32()
@@ -109,7 +120,16 @@ namespace RealArm
 
             _handData.QueryHandDataById(handId, out ihand);
 
-            return ihand.QueryMassCenterWorld();
+            if (ihand != null)
+            {
+                return ihand.QueryMassCenterWorld();
+            }
+            else
+            {
+                throw new HandNotFoundException();
+            }
+
+
         }
 
         public void ActivateGripper()
@@ -145,11 +165,16 @@ namespace RealArm
             armActive = false;
         }
 
-        private void BlinkLight()
+        public void BlinkLight()
         {
             _robotArm.setLight(true);
             Task.Delay(1000);
             _robotArm.setLight(false);
+            Task.Delay(1000);
+            _robotArm.setLight(true);
+            Task.Delay(1000);
+            _robotArm.setLight(false);
+
         }
 
         public void AssertArmMovement()
@@ -182,12 +207,13 @@ namespace RealArm
 
         public void Dispose()
         {
-            if (_senseManager != null)
-            {
-                _senseManager.Close();
-                _senseManager = null;
-                Session = null;
-            }
+            _senseManager.Close();
+            Session.Dispose();
+            _senseManager.Dispose();
+            _handConfiguration.Dispose();
+            _handModule.Dispose();
+            
+            _handData.Dispose();
         }
 
         public void ZeroArm()
@@ -199,5 +225,10 @@ namespace RealArm
         {
             _robotArm.moveTo(150, 250, 65);
         }
+    }
+
+    public class HandNotFoundException : Exception
+    {
+
     }
 }
