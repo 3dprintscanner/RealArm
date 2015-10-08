@@ -1,16 +1,29 @@
 ﻿<Window x:Class="RealArmFrontEnd.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="350" Width="525" Closing="Window_Closing">
-    <Grid>
-        <StackPanel HorizontalAlignment="Left" Height="299" Margin="10,10,0,0" VerticalAlignment="Top" Width="497">
-            <Image x:Name="imgColourStream" Height="197"/>
-            <Button x:Name="sensorbutton" Content="Activate Realsense" Margin="0,0,394,0" Click="sensorbutton_Click"/>
-            <Button x:Name="armbutton" Content="Activate Arm" Margin="0,0,394,0" RenderTransformOrigin="2.65,-0.05" Click="armbutton_Click"/>
-            <Label x:Name="handPosition" Content="Label" Margin="0,0,276,0"/>
-            <Button x:Name="MoveArm" Content="Move Arm" Margin="0,0,394,0" Click="MoveArm_Click"/>
-            <Button Content="Zero Arm" Margin="0,0,394,0" Click="Button_Click"/>
+        Title="MainWindow" Height="377" Width="633" Closing="Window_Closing">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="182" />
+            <RowDefinition Height="Auto" MinHeight="148">
+            </RowDefinition>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" MinWidth="142"></ColumnDefinition>
+            <ColumnDefinition Width="Auto" MinWidth="385"></ColumnDefinition>
+            <ColumnDefinition Width="Auto"></ColumnDefinition>
+        </Grid.ColumnDefinitions>
+        <StackPanel HorizontalAlignment="Left" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="15,15,0,0" VerticalAlignment="Top" Width="497" RenderTransformOrigin="-0.115,1.161" Height="191" Grid.RowSpan="2">
+            <Image x:Name="imgColourStream" Height="165" RenderTransformOrigin="0.858,-0.17"/>
         </StackPanel>
-
+        <StackPanel Grid.Row="2" Grid.Column="0" Margin="10">
+            <Button x:Name="armbutton" Content="Activate Arm" Margin="2" Padding="5" RenderTransformOrigin="2.65,-0.05" Click="armbutton_Click"/>
+            <Button Content="Zero Arm" Click="Button_Click" Margin="2" Padding="5" />
+            <Button x:Name="sensorbutton" Content="Activate Realsense" Margin="2" Padding="5" Click="sensorbutton_Click"/>
+            <Button x:Name="MoveArm" Content="Move Arm" Margin="2" Padding="5" Click="MoveArm_Click"/>
+        </StackPanel>
+        <StackPanel Grid.Row="2" Grid.Column="1">
+            <Label x:Name="handPosition" Content="Label" Margin="0,0,0,0" />
+        </StackPanel>
     </Grid>
 </Window>
