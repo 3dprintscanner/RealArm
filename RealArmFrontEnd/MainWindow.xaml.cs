@@ -12,9 +12,11 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using RealArm;
+using TestOwi535;
 
 namespace RealArmFrontEnd
 {
@@ -30,6 +32,7 @@ namespace RealArmFrontEnd
         private int frameCounter = 0;
         private bool calibrated;
         private string labelContent;
+
         
         public MainWindow()
         {
@@ -37,13 +40,22 @@ namespace RealArmFrontEnd
             _movementController = new MovementController(new PXCMSenseManager.Handler
             {
                 onModuleProcessedFrame = OnModuleProcessedFrame,
-                onNewSample = OnNewSample
+                onNewSample = OnNewSample,
+                onConnect = OnConnect
             },
             OnFiredGesture,
             OnFiredAlert);
             calibrated = false;
 
 
+        }
+
+        private pxcmStatus OnConnect(PXCMCapture.Device device, bool connected)
+        {
+
+            Dispatcher.Invoke(() => sensorbutton.Content = "Deactivate Sensor");
+            
+            return pxcmStatus.PXCM_STATUS_NO_ERROR;
         }
 
         private void OnFiredGesture(PXCMHandData.GestureData gestureData)
@@ -125,9 +137,9 @@ namespace RealArmFrontEnd
             }
         }
 
-        private void startStream()
+        private async void startStream()
         {
-                _movementController.Listen();
+                await Task.Run(() => _movementController.Listen());
         }
 
         private pxcmStatus OnNewSample(int mid, PXCMCapture.Sample sample)
@@ -169,7 +181,7 @@ namespace RealArmFrontEnd
                     this.Dispatcher.Invoke((() =>
                     {
                         var position = _movementController.GetHandPosition();
-                        handPosition.Content = position;
+                        outputbox.Text +="\n" + position;
                     }));
                     _movementController.AssertArmMovement();
                     frameCounter = 0;                                                   
@@ -187,14 +199,19 @@ namespace RealArmFrontEnd
            
             if (!_movementController.sensorActive)
             {
-                thread = new Thread(new ThreadStart(startStream));
-                thread.Start();
+                startStream();
+                
             }
             else
             {
-                thread.Abort();
                 sensorbutton.Content = "Activate Sensor";
+                stopStream();
             }                      
+        }
+
+        private async void stopStream()
+        {
+            await Task.Run(() => _movementController.UnListen());
         }
 
         private void armbutton_Click(object sender, RoutedEventArgs e)
@@ -202,10 +219,12 @@ namespace RealArmFrontEnd
             if (!_movementController.armActive)
             {
                 _movementController.ActivateActuator();
+                Dispatcher.Invoke(() => armbutton.Content = "Deactivate Arm");
             }
             else
             {
                 _movementController.DeactivateActuator();
+                Dispatcher.Invoke(() => armbutton.Content = "Activate Arm");
             }
         }
 
@@ -214,19 +233,75 @@ namespace RealArmFrontEnd
             _movementController.ZeroArm();
         }
 
-        private void MoveArm_Click(object sender, RoutedEventArgs e)
-        {
-            _movementController.TestMove();
-        }
-
+        
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             //deregister event handlers
+            if(_movementController != null) _movementController.Dispose();
+            if(colourBitMap != null) colourBitMap.Dispose();
+            Environment.Exit(0);
+        }
 
+        private void calibratezero_click(object sender, RoutedEventArgs e)
+        {
+            _movementController.ResetCalibration();
+            Dispatcher.Invoke(() => outputbox.Text += "\n Arm Zeroed");
+        }
 
-            thread.Abort();
-            _movementController.Dispose();
-            colourBitMap.Dispose();
+        private void grab_button_Click(object sender, RoutedEventArgs e)
+        {
+            _movementController.ActivateGripper();
+        }
+
+        private void light_button_Click(object sender, RoutedEventArgs e)
+        {
+            _movementController.BlinkLight();
+        }
+
+        private void elbow_up_button_Click(object sender, RoutedEventArgs e)
+        {
+            _movementController.Move(JointID.ELBOW, ArmCommunicator.POSITIVE);
+        }
+
+        private void elbow_down_button_Click(object sender, RoutedEventArgs e)
+        {
+            _movementController.Move(JointID.ELBOW, ArmCommunicator.NEGATIVE);
+        }
+
+        private void shoulder_up_buton_Click(object sender, RoutedEventArgs e)
+        {
+            _movementController.Move(JointID.SHOULDER, ArmCommunicator.POSITIVE);
+        }
+
+        private void shoulder_down_button_Click(object sender, RoutedEventArgs e)
+        {
+            _movementController.Move(JointID.SHOULDER, ArmCommunicator.NEGATIVE);
+        }
+
+        private void base_left_button_Click(object sender, RoutedEventArgs e)
+        {
+            _movementController.Move(JointID.BASE, ArmCommunicator.POSITIVE);
+        }
+
+        private void base_right_button_Click(object sender, RoutedEventArgs e)
+        {
+            _movementController.Move(JointID.BASE, ArmCommunicator.NEGATIVE);
+        }
+
+        private void wrist_up_button_click(object sender, RoutedEventArgs e)
+        {
+            _movementController.Move(JointID.WRIST, ArmCommunicator.POSITIVE);
+        }
+
+        private void wrist_down_button_Click(object sender, RoutedEventArgs e)
+        {
+            _movementController.Move(JointID.WRIST, ArmCommunicator.NEGATIVE);
+        }
+
+        private void queryposition_Click(object sender, RoutedEventArgs e)
+        {
+             var positionString = _movementController.GetArmPosition();
+            Dispatcher.Invoke(() => outputbox.Text += "\n Position is: " + positionString);
         }
     }
 }

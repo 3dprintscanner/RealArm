@@ -103,6 +103,10 @@
       <Project>{9969662F-725C-445B-B5C4-9A6D2420CF13}</Project>
       <Name>RealArm</Name>
     </ProjectReference>
+    <ProjectReference Include="..\TestOwi535\TestOwi535.csproj">
+      <Project>{8677c131-8c1b-4cb8-b940-9081f0ffac30}</Project>
+      <Name>TestOwi535</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

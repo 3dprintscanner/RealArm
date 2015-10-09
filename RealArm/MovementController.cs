@@ -10,7 +10,6 @@ namespace RealArm
 {
     public class MovementController : MovementControllerBase, IDisposable
     {
-
         public IArm arm { get; set; }
         public ISensor sensor { get; set; }
         public PXCMSession Session;
@@ -30,8 +29,6 @@ namespace RealArm
         private PXCMHandData.IHand _iHand;
         private PXCMHandData _handData;
         
-          
-
         public IArmConfiguration ArmConfiguration { get; set; }
 
         public MovementController(PXCMSenseManager.Handler handler,
@@ -81,18 +78,17 @@ namespace RealArm
             _senseManager.Init(_handler);
             sensorActive = true;
             _senseManager.StreamFrames(true);
-            _senseManager.Close();
-            
-
-        }
+            _senseManager.Close();           
+            }
 
         public string GetHandPosition()
         {
             try
             {
                 Coord3D handLocation = GetTransformPosition(GetHandPXCMPoint32());
-                return String.Format("X={0}, Y={1}, Z={2}", (handLocation.X), (handLocation.Y),
-                    (handLocation.Z));
+                var pxcmpoint = GetHandPXCMPoint32();
+                return String.Format("X={0}, Y={1}, Z={2}, x={3}, y={4}, z={5}", (handLocation.X), (handLocation.Y),
+                    (handLocation.Z),pxcmpoint.x,pxcmpoint.y,pxcmpoint.z);
             }
             catch (HandNotFoundException exception)
             {
@@ -143,6 +139,7 @@ namespace RealArm
         public override void UnListen()
         {
             _senseManager.StreamFrames(false);
+            _senseManager.FlushFrame();
             _senseManager.Close();
             _senseManager = null;
             sensorActive = false;
@@ -162,7 +159,7 @@ namespace RealArm
             _robotArm.setLight(false);
             _robotArm.close();
             _robotArm = null;
-            armActive = false;
+            armActive = false;            
         }
 
         public void BlinkLight()
@@ -182,9 +179,19 @@ namespace RealArm
             if (!armActive) return;
             // calculate the difference between the processed frames and move the arm if a threshold for sensitivity is reached
             _handData.Update();
-            var handPosition = GetHandPXCMPoint32();
-            var transformPosition = GetTransformPosition(handPosition);
-            _robotArm.moveTo(transformPosition);
+            try
+            {
+                var handPosition = GetHandPXCMPoint32();
+                var transformPosition = GetTransformPosition(handPosition);
+                _robotArm.moveTo(transformPosition);
+            }
+            catch (HandNotFoundException)
+            {
+                Console.WriteLine("No Hand Found");
+            }
+            //var handPosition = GetHandPXCMPoint32();
+            //var transformPosition = GetTransformPosition(handPosition);
+            //_robotArm.moveTo(transformPosition);
             //_robotArm.moveTo(150, 250,70);
         }
 
@@ -196,24 +203,37 @@ namespace RealArm
             // The co-ordinates are positive
             // e.g x+0.25 *maxlengthX and so forth.
 
-            // 300,300,150
+            // 300,300,270
+
+            // x is -+165 to 
 
             
-            handPosition.x = (handPosition.x + 0.25f)*(300/0.25f);
-            handPosition.y *= (handPosition.y + 0.15f) * (300 / 0.15f);
-            handPosition.z *= (handPosition.z) * (150 / 0.55f);
-            return new Coord3D((int)Math.Ceiling(handPosition.x),(int)Math.Ceiling(handPosition.y),(int)Math.Ceiling(handPosition.z));
+            //handPosition.x = (handPosition.x + 0.25f)*(300/0.25f);
+            //handPosition.y *= (handPosition.y + 0.15f) * (300 / 0.15f);
+            //handPosition.z *= (handPosition.z) * (150 / 0.55f);
+
+            var outputX = -(handPosition.x/0.25f)*300f;
+            var outputZ = 280f - ((handPosition.y + 0.15f)/0.3f)*280f;
+            var outputY = 280f - (handPosition.z/0.55f)*280f;
+
+            
+
+
+
+            return new Coord3D((int)Math.Ceiling(outputX),(int)Math.Ceiling(outputY),(int)Math.Ceiling(outputZ));
         }
 
         public void Dispose()
         {
-            _senseManager.Close();
-            Session.Dispose();
-            _senseManager.Dispose();
-            _handConfiguration.Dispose();
-            _handModule.Dispose();
-            
-            _handData.Dispose();
+            if (_senseManager != null)
+            {
+                _senseManager.Close();
+                _senseManager.Dispose();
+                _handConfiguration.Dispose();
+                _handModule.Dispose();
+                Session.Dispose();
+                _handData.Dispose();
+            }
         }
 
         public void ZeroArm()
@@ -221,9 +241,26 @@ namespace RealArm
             _robotArm.moveToZero();
         }
 
+        public void ResetCalibration()
+        {
+            _robotArm.ResetJointCalibration();
+        }
+
         public void TestMove()
         {
             _robotArm.moveTo(150, 250, 65);
+        }
+
+        public void Move(JointID jointid, int negative)
+        {
+            var angle = negative != 0 ? 10 : -10;
+            _robotArm.turnByOffset(jointid, angle);
+        }
+
+        public string GetArmPosition()
+        {
+            var coord = _robotArm.getCoord();
+            return String.Format("x = {0}, y= {1}, z= {2}", coord.X, coord.Y, coord.Z);
         }
     }
 

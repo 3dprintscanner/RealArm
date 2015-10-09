@@ -147,7 +147,7 @@ public class Joint
           angle: <currAngle int>
   */
   {
-    Console.WriteLine("Openning joint info file: " + fnm);
+    Console.WriteLine("Opening joint info file: " + fnm);
     String line;
     String[] toks;
     try {
@@ -239,9 +239,12 @@ public class Joint
     }
   }  // end of checkInfo()
 
+    public void zeroJoint()
+    {
+        this.currAngle = 0;
+    }
 
-
-  private void writeJointInfo(String fnm)
+    private void writeJointInfo(String fnm)
   // write out three lines for the joint info
   {
     try {

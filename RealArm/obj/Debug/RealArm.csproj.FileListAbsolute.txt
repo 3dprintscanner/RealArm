@@ -4,7 +4,6 @@ C:\Users\3dstation\Documents\Visual Studio 2012\Projects\RealArm\RealArm\bin\Deb
 C:\Users\3dstation\Documents\Visual Studio 2012\Projects\RealArm\RealArm\bin\Debug\LibUsbDotNet.dll
 C:\Users\3dstation\Documents\Visual Studio 2012\Projects\RealArm\RealArm\obj\Debug\RealArm.dll
 C:\Users\3dstation\Documents\Visual Studio 2012\Projects\RealArm\RealArm\obj\Debug\RealArm.pdb
-C:\Users\anthony\Documents\RealArm\RealArm\obj\Debug\RealArm.csprojResolveAssemblyReference.cache
 C:\Users\anthony\Documents\RealArm\RealArm\bin\Debug\baseJI.txt
 C:\Users\anthony\Documents\RealArm\RealArm\bin\Debug\elbowJI.txt
 C:\Users\anthony\Documents\RealArm\RealArm\bin\Debug\shoulderJI.txt
@@ -15,5 +14,6 @@ C:\Users\anthony\Documents\RealArm\RealArm\bin\Debug\libpxcclr.cs.dll
 C:\Users\anthony\Documents\RealArm\RealArm\bin\Debug\TestOwi535.exe
 C:\Users\anthony\Documents\RealArm\RealArm\bin\Debug\LibUsbDotNet.dll
 C:\Users\anthony\Documents\RealArm\RealArm\bin\Debug\TestOwi535.pdb
+C:\Users\anthony\Documents\RealArm\RealArm\obj\Debug\RealArm.csprojResolveAssemblyReference.cache
 C:\Users\anthony\Documents\RealArm\RealArm\obj\Debug\RealArm.dll
 C:\Users\anthony\Documents\RealArm\RealArm\obj\Debug\RealArm.pdb

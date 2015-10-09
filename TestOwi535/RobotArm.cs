@@ -91,8 +91,8 @@ public class RobotArm
     else 
       Console.WriteLine("Unknown joint ID: " + jid);
   } // end of turnToAngle()
-
-
+    
+    
 
   public void openGripper(bool isOpen)
   { armComms.openGripper(isOpen); }
@@ -285,9 +285,15 @@ public class RobotArm
     }
   }  // end of moveItem()
 
+    public void ResetJointCalibration()
+    {
+        for (int i = 0; i < joints.Length; i++)
+        {
+            joints[i].zeroJoint();
+        }
+    }
 
-
-  // ------------------------------------ test rig --------------------------
+    // ------------------------------------ test rig --------------------------
   // MODIFY main() to test out different arm movements
 
   public static void Main(string[] args)

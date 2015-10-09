@@ -1,29 +1,54 @@
 ﻿<Window x:Class="RealArmFrontEnd.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="MainWindow" Height="377" Width="633" Closing="Window_Closing">
-    <Grid Margin="10">
+        Title="MainWindow" Height="522.205" Width="915.417" Closing="Window_Closing">
+    <Grid Margin="10" Background="DarkGray">
         <Grid.RowDefinitions>
-            <RowDefinition Height="182" />
-            <RowDefinition Height="Auto" MinHeight="148">
+            <RowDefinition Height="301" />
+            <RowDefinition Height="Auto" MinHeight="268">
             </RowDefinition>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" MinWidth="142"></ColumnDefinition>
-            <ColumnDefinition Width="Auto" MinWidth="385"></ColumnDefinition>
-            <ColumnDefinition Width="Auto"></ColumnDefinition>
+            <ColumnDefinition Width="510"/>
+            <ColumnDefinition Width="96"/>
+            <ColumnDefinition Width="Auto" MinWidth="71"></ColumnDefinition>
+            <ColumnDefinition></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <StackPanel HorizontalAlignment="Left" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="15,15,0,0" VerticalAlignment="Top" Width="497" RenderTransformOrigin="-0.115,1.161" Height="191" Grid.RowSpan="2">
-            <Image x:Name="imgColourStream" Height="165" RenderTransformOrigin="0.858,-0.17"/>
+        <StackPanel HorizontalAlignment="Left" Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Margin="15,15,0,0" VerticalAlignment="Top" Width="497" RenderTransformOrigin="-0.115,1.161" Height="302" Grid.RowSpan="2">
+            <Image x:Name="imgColourStream" Height="280" RenderTransformOrigin="0.858,-0.17" Margin="0,0,10,0"/>
         </StackPanel>
-        <StackPanel Grid.Row="2" Grid.Column="0" Margin="10">
-            <Button x:Name="armbutton" Content="Activate Arm" Margin="2" Padding="5" RenderTransformOrigin="2.65,-0.05" Click="armbutton_Click"/>
+        <StackPanel Grid.Row="1" Grid.Column="0" Margin="5,5,5,10">
+            <Button x:Name="armbutton" Content="Activate Arm" Margin="2" Padding="5" Click="armbutton_Click"/>
             <Button Content="Zero Arm" Click="Button_Click" Margin="2" Padding="5" />
             <Button x:Name="sensorbutton" Content="Activate Realsense" Margin="2" Padding="5" Click="sensorbutton_Click"/>
-            <Button x:Name="MoveArm" Content="Move Arm" Margin="2" Padding="5" Click="MoveArm_Click"/>
+            <Button x:Name="queryposition" Content="Query Position" Margin="2" Padding="5" Click="queryposition_Click"/>
+            <Button x:Name="calibratezero" Content="Calibrate Zero" Margin="2" Padding="5" Click="calibratezero_click"/>
         </StackPanel>
-        <StackPanel Grid.Row="2" Grid.Column="1">
-            <Label x:Name="handPosition" Content="Label" Margin="0,0,0,0" />
+        <StackPanel Grid.Column="1" Grid.ColumnSpan="2" Margin="0,21,0,98" Grid.Row="1">
+            <TextBox x:Name="outputbox" Height="137" TextWrapping="Wrap" Text="" VerticalScrollBarVisibility="Visible" Margin="0,0,109,0"/>
         </StackPanel>
+        <StackPanel Grid.Row="1" Grid.Column="3" RenderTransformOrigin="0.605,-0.424" Background="DarkGray">
+            <Button x:Name="grab_button" Content="Grab" Grid.Column="2" HorizontalAlignment="Left" Margin="5" Grid.Row="1" VerticalAlignment="Top" Width="50" Height="20" Click="grab_button_Click"/>
+            <Button x:Name="wrist_up_button" Content="Up" Grid.Column="2" HorizontalAlignment="Left" Margin="5" Grid.Row="1" VerticalAlignment="Top" Width="50" Height="20" Click="wrist_up_button_click"/>
+            <Button x:Name="elbow_up_button" Content="Up" HorizontalAlignment="Left" Margin="5" VerticalAlignment="Top" Width="50" Height="20" Click="elbow_up_button_Click"/>
+            <Button x:Name="shoulder_up_buton" Content="Up" Grid.Column="2" HorizontalAlignment="Left" Margin="5" Grid.Row="1" VerticalAlignment="Top" Width="50" Height="20" Click="shoulder_up_buton_Click"/>
+            <Button x:Name="base_left_button" Content="Left" Grid.Column="2" HorizontalAlignment="Left" Margin="5" Grid.Row="1" VerticalAlignment="Top" Width="50" Height="20" Click="base_left_button_Click"/>
+        </StackPanel>
+        <StackPanel Grid.Row="1" Grid.Column="4" RenderTransformOrigin="0.605,-0.424" Background="DarkGray">
+            <Button x:Name="light_button" Content="Light" Grid.Column="2" HorizontalAlignment="Left" Margin="5" Grid.Row="1" VerticalAlignment="Top" Width="50" Height="20" Click="light_button_Click"/>
+            <Button x:Name="wrist_down_button" Content="Down" Grid.Column="2" HorizontalAlignment="Left" Margin="5" Grid.Row="1" VerticalAlignment="Top" Width="50" Height="20" Click="wrist_down_button_Click"/>
+            <Button x:Name="elbow_down_button" Content="Down" HorizontalAlignment="Left" Margin="5" VerticalAlignment="Top" Width="50" Height="20" Click="elbow_down_button_Click"/>
+            <Button x:Name="shoulder_down_button" Content="Down" Grid.Column="2" HorizontalAlignment="Left" Margin="5" Grid.Row="1" VerticalAlignment="Top" Width="50" Height="20" Click="shoulder_down_button_Click"/>
+            <Button x:Name="base_right_button" Content="Right" Grid.Column="2" HorizontalAlignment="Left" Margin="5" Grid.Row="1" VerticalAlignment="Top" Width="50" Height="20" Click="base_right_button_Click"/>
+        </StackPanel>
+        <StackPanel Grid.Row="1" Grid.Column="2" Background="DarkGray">
+            <Label Content="Grab/Light" Margin="2"/>
+            <Label Content="Wrist U/D" Margin="2"/>
+            <Label Content="Elbow U/D" Margin="2"/>
+            <Label Content="Shoulder U/D" Margin="2"/>
+            <Label Content="Base L/R" Margin="2"/>
+        </StackPanel>
+
     </Grid>
 </Window>
