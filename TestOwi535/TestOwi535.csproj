@@ -36,7 +36,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>TestOwi535.ArmCommunicator</StartupObject>
+    <StartupObject>TestOwi535.MainClass</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="LibUsbDotNet">

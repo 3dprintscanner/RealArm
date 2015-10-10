@@ -46,8 +46,7 @@ namespace RealArmFrontEnd
             OnFiredGesture,
             OnFiredAlert);
             calibrated = false;
-
-
+            DisableMovementButtons();
         }
 
         private pxcmStatus OnConnect(PXCMCapture.Device device, bool connected)
@@ -181,7 +180,7 @@ namespace RealArmFrontEnd
                     this.Dispatcher.Invoke((() =>
                     {
                         var position = _movementController.GetHandPosition();
-                        outputbox.Text +="\n" + position;
+                        outputbox.Text = AppendOutputboxText(position);
                     }));
                     _movementController.AssertArmMovement();
                     frameCounter = 0;                                                   
@@ -192,7 +191,13 @@ namespace RealArmFrontEnd
             return pxcmStatus.PXCM_STATUS_NO_ERROR;
         }
 
-    
+        private string AppendOutputboxText(string text)
+        {
+            return text + "\n" + outputbox.Text;
+        }
+
+
+
         private void sensorbutton_Click(object sender, RoutedEventArgs e)
         {
             // activate the realsense sensor
@@ -220,24 +225,58 @@ namespace RealArmFrontEnd
             {
                 _movementController.ActivateActuator();
                 Dispatcher.Invoke(() => armbutton.Content = "Deactivate Arm");
+                EnableMovementButtons();
             }
             else
             {
                 _movementController.DeactivateActuator();
                 Dispatcher.Invoke(() => armbutton.Content = "Activate Arm");
+                DisableMovementButtons();
             }
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void DisableMovementButtons()
         {
-            _movementController.ZeroArm();
+            shoulder_down_button.IsEnabled = false;
+            shoulder_up_buton.IsEnabled = false;
+            wrist_down_button.IsEnabled = false;
+            wrist_up_button.IsEnabled = false;
+            base_left_button.IsEnabled = false;
+            base_right_button.IsEnabled = false;
+            grab_button.IsEnabled = false;
+            light_button.IsEnabled = false;
+            calibratezero.IsEnabled = false;
+            elbow_down_button.IsEnabled = false;
+            elbow_up_button.IsEnabled = false;
+            queryposition.IsEnabled = false;
+            zerobutton.IsEnabled = false;
+
+
         }
 
-        
+        private void EnableMovementButtons()
+        {
+            shoulder_down_button.IsEnabled = true;
+            shoulder_up_buton.IsEnabled = true;
+            wrist_down_button.IsEnabled = true;
+            wrist_up_button.IsEnabled = true;
+            base_left_button.IsEnabled = true;
+            base_right_button.IsEnabled = true;
+            grab_button.IsEnabled = true;
+            light_button.IsEnabled = true;
+            calibratezero.IsEnabled = true;
+            elbow_down_button.IsEnabled = true;
+            elbow_up_button.IsEnabled = true;
+            queryposition.IsEnabled = true;
+            zerobutton.IsEnabled = true;
+        }
+
+       
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             //deregister event handlers
             if(_movementController != null) _movementController.Dispose();
+            colorData = null;
             if(colourBitMap != null) colourBitMap.Dispose();
             Environment.Exit(0);
         }
@@ -245,7 +284,7 @@ namespace RealArmFrontEnd
         private void calibratezero_click(object sender, RoutedEventArgs e)
         {
             _movementController.ResetCalibration();
-            Dispatcher.Invoke(() => outputbox.Text += "\n Arm Zeroed");
+            Dispatcher.Invoke(() => outputbox.Text = AppendOutputboxText("Arm Zeroed"));
         }
 
         private void grab_button_Click(object sender, RoutedEventArgs e)
@@ -301,7 +340,13 @@ namespace RealArmFrontEnd
         private void queryposition_Click(object sender, RoutedEventArgs e)
         {
              var positionString = _movementController.GetArmPosition();
-            Dispatcher.Invoke(() => outputbox.Text += "\n Position is: " + positionString);
+             Dispatcher.Invoke(() => outputbox.Text = AppendOutputboxText("Position is: " + positionString));
+        }
+
+
+        private void zerobutton_Click(object sender, RoutedEventArgs e)
+        {
+            _movementController.ZeroArm();
         }
     }
 }

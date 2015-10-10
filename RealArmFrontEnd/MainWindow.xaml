@@ -20,7 +20,7 @@
         </StackPanel>
         <StackPanel Grid.Row="1" Grid.Column="0" Margin="5,5,5,10">
             <Button x:Name="armbutton" Content="Activate Arm" Margin="2" Padding="5" Click="armbutton_Click"/>
-            <Button Content="Zero Arm" Click="Button_Click" Margin="2" Padding="5" />
+            <Button x:Name="zerobutton" Content="Zero Arm" Click="zerobutton_Click" Margin="2" Padding="5" />
             <Button x:Name="sensorbutton" Content="Activate Realsense" Margin="2" Padding="5" Click="sensorbutton_Click"/>
             <Button x:Name="queryposition" Content="Query Position" Margin="2" Padding="5" Click="queryposition_Click"/>
             <Button x:Name="calibratezero" Content="Calibrate Zero" Margin="2" Padding="5" Click="calibratezero_click"/>

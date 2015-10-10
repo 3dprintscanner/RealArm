@@ -139,7 +139,7 @@ namespace RealArm
         public override void UnListen()
         {
             _senseManager.StreamFrames(false);
-            _senseManager.FlushFrame();
+            //_senseManager.FlushFrame();
             _senseManager.Close();
             _senseManager = null;
             sensorActive = false;
@@ -174,7 +174,7 @@ namespace RealArm
 
         }
 
-        public void AssertArmMovement()
+        public async void AssertArmMovement()
         {
             if (!armActive) return;
             // calculate the difference between the processed frames and move the arm if a threshold for sensitivity is reached
@@ -183,7 +183,7 @@ namespace RealArm
             {
                 var handPosition = GetHandPXCMPoint32();
                 var transformPosition = GetTransformPosition(handPosition);
-                _robotArm.moveTo(transformPosition);
+                await Task.Run(() =>_robotArm.moveTo(transformPosition));
             }
             catch (HandNotFoundException)
             {
@@ -213,8 +213,8 @@ namespace RealArm
             //handPosition.z *= (handPosition.z) * (150 / 0.55f);
 
             var outputX = -(handPosition.x/0.25f)*300f;
-            var outputZ = 280f - ((handPosition.y + 0.15f)/0.3f)*280f;
-            var outputY = 280f - (handPosition.z/0.55f)*280f;
+            var outputZ = 1.1f*((handPosition.y + 0.15f)/0.3f)*280f;
+            var outputY = 280f - (handPosition.z/1.25f)*280f;
 
             
 
