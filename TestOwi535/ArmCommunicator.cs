@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 using LibUsbDotNet;
@@ -7,6 +8,7 @@ using LibUsbDotNet.Main;
 using System.Windows;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Windows.Documents;
 
 namespace TestOwi535
 {
@@ -188,6 +190,11 @@ namespace TestOwi535
          Wrist forwards == 0x04          Wrist backwards == 0x08
          Elbow forwards == 0x10          Elbow backwards == 0x20
          Shoulder forwards == 0x40       Shoulder backwards == 0x80
+       * 
+       * All Stop = 0x00
+        Wrist Stop = 0x03, 0x0c
+        Elbow Stop = 0x30
+        Shoulder Stop = 0xc0
    
        Second byte:
          Base rotate right == 0x01  Base rotate left == 0x02
@@ -335,37 +342,198 @@ namespace TestOwi535
       }  // end of printHelp()
 
 
-      private static void doArmOp(char ch, ArmCommunicator arm)
-      // use POSITIVE for forwards/right turns; NEGATIVE for backwards/left turns
-      {
-         if (ch == 'w')         // gripper close
-           arm.openGripper(false);
-         else if (ch == 's')    // gripper open
-           arm.openGripper(true);
-         else if (ch == 'e')    // wrist forwards
-           arm.turn(JointID.WRIST, ArmCommunicator.POSITIVE, DELAY); 
-         else if (ch == 'd')    // wrist backwards
-           arm.turn(JointID.WRIST, ArmCommunicator.NEGATIVE, DELAY);
-         else if (ch == 'r')    // elbow forwards
-           arm.turn(JointID.ELBOW, ArmCommunicator.POSITIVE, DELAY); 
-         else if (ch == 'f')    // elbow backwards
-           arm.turn(JointID.ELBOW, ArmCommunicator.NEGATIVE, DELAY);
-         else if (ch == 'u')    // shoulder forwards
-           arm.turn(JointID.SHOULDER, ArmCommunicator.POSITIVE, DELAY);
-         else if (ch == 'j')    // shoulder backwards
-           arm.turn(JointID.SHOULDER, ArmCommunicator.NEGATIVE, DELAY);
-         else if (ch == 'k')    // base left
-           arm.turn(JointID.BASE, ArmCommunicator.NEGATIVE, DELAY); 
-         else if (ch == 'i')    // base right
-           arm.turn(JointID.BASE, ArmCommunicator.POSITIVE, DELAY);
-         else if (ch == 'l')    // light on
-           arm.setLight(true);
-         else if (ch == 'p')    // light off
-           arm.setLight(false);
-         else
-           Console.WriteLine("Unknown command: " + ch);
-      }  // end of doArmOp() 
+        private static void doArmOp(char ch, ArmCommunicator arm)
+            // use POSITIVE for forwards/right turns; NEGATIVE for backwards/left turns
+        {
+            if (ch == 'w') // gripper close
+                arm.openGripper(false);
+            else if (ch == 's') // gripper open
+                arm.openGripper(true);
+            else if (ch == 'e') // wrist forwards
+                arm.turn(JointID.WRIST, ArmCommunicator.POSITIVE, DELAY);
+            else if (ch == 'd') // wrist backwards
+                arm.turn(JointID.WRIST, ArmCommunicator.NEGATIVE, DELAY);
+            else if (ch == 'r') // elbow forwards
+                arm.turn(JointID.ELBOW, ArmCommunicator.POSITIVE, DELAY);
+            else if (ch == 'f') // elbow backwards
+                arm.turn(JointID.ELBOW, ArmCommunicator.NEGATIVE, DELAY);
+            else if (ch == 'u') // shoulder forwards
+                arm.turn(JointID.SHOULDER, ArmCommunicator.POSITIVE, DELAY);
+            else if (ch == 'j') // shoulder backwards
+                arm.turn(JointID.SHOULDER, ArmCommunicator.NEGATIVE, DELAY);
+            else if (ch == 'k') // base left
+                arm.turn(JointID.BASE, ArmCommunicator.NEGATIVE, DELAY);
+            else if (ch == 'i') // base right
+                arm.turn(JointID.BASE, ArmCommunicator.POSITIVE, DELAY);
+            else if (ch == 'l') // light on
+                arm.setLight(true);
+            else if (ch == 'p') // light off
+                arm.setLight(false);
+            else if (ch == 't')
+            {
+                arm.sendControl(0x04, 0x01, 0x01);
+                arm.wait(1000);
+                arm.sendControl(0x00, 0x00, 0x00);
+            }
+            else if (ch == '1')
+            {
+                arm.sendControl(0x31, 0x00, 0x00);
+                arm.wait(1000);
+                arm.sendControl(0x00, 0x00, 0x00);
+            }
+            else if (ch == '2')
+            {
+                arm.sendControl(0x07, 0x00, 0x00);
+                arm.wait(1000);
+                arm.sendControl(0x00, 0x00, 0x00);
+            }
+            else if (ch == '3'){
+                arm.sendControl(0x03, 0x00, 0x00);
+            arm.wait(1000);
+            arm.sendControl(0x00, 0x00, 0x00);
+        }
 
-    }  // end of ArmCommunicator class
+    else if (ch == '4')
+    {
+        arm.sendControl(0x04, 0x00, 0x00);
+        arm.wait(1000);
+        arm.sendControl(0x00, 0x00, 0x00);
+    }
+    else if (ch == '5')
+    {
+        arm.sendControl(0x20, 0x01, 0x00);
+        Console.WriteLine("First Command");
+        arm.wait(1000);
+        arm.sendControl(0x30, 0x01, 0x00);
+        Console.WriteLine("Second Command");
+        arm.wait(1000);
+        arm.sendControl(0x00, 0x00, 0x00);
+    }
+            else if (ch == '6')
+            {
+                arm.sendControl(0x58, 0x01, 0x00);
+                arm.wait(1000);
+                arm.sendControl(0x00, 0x00, 0x00);
+            }
+            else if (ch == '7')
+            {
+                arm.sendControl(0x40, 0x01, 0x00);
+                Console.WriteLine("First Command");
+                arm.wait(1000);
+                arm.sendControl((0xc0+ 0x10), 0x01, 0x00);
+                Console.WriteLine("Second Command");
+                arm.wait(1000);
+                arm.sendControl(0x00,0x00,0x00);
+            }
+    else
+        Console.WriteLine("Unknown command: " + ch);
+        }  // end of doArmOp() 
+
+        public void compositeTurn(List<Move> moves)
+        {
+            // For each move, order the moves by time, work out the gaps between the move times and create a scheduler to stop the moves
+            // or create a thread which calls a function after a certain amount of time which sends the stop byte for the given joint
+
+
+           //moves.Sort((x,y)=>x.time.CompareTo(y.time));
+            moves.OrderBy(x => x.time);
+
+           // create a set of all the moves required
+            List<int[]> opCodeMoves = new List<int[]>();
+
+            int[] movelist = new int[]{};
+
+            for (int i = 0; i < moves.Count; i++)
+            {
+                var opCode = GenerateOpCodes(moves[i].JointId,moves[i].direction);
+                movelist[i] += opCode[0];
+                for (int j = i+1; j < moves.Count; j++)
+                {
+                    // get the opcodes of the rest of the moves
+                    var opcode = GenerateOpCodes(moves[j].JointId, moves[j].direction);
+                    movelist[i] += opcode[0];
+                    movelist[j] = GetCancelOpcode(moves[i].JointId);
+                }
+                // the first byte value is the sum of the opcodes for the moves at a time
+                // this is the sum of the opcodes for 
+            }
+            
+
+            int[] timeList = new int[]{};
+            for (int i = 0; i < moves.Count; i++)
+            {
+                timeList[i] = moves[i].time;
+            }
+
+            
+            
+            //int opCode1 = 0x00;
+            //int opCode2 = 0x00;
+
+            //if (jid == JointID.BASE)
+            //    opCode2 = (dir == POSITIVE) ? 0x01 : 0x02;
+            //else if (jid == JointID.SHOULDER)
+            //    opCode1 = (dir == POSITIVE) ? 0x80 : 0x40;
+            //else if (jid == JointID.ELBOW)
+            //    opCode1 = (dir == POSITIVE) ? 0x20 : 0x10;
+            //else if (jid == JointID.WRIST)
+            //    opCode1 = (dir == POSITIVE) ? 0x08 : 0x04;
+            //else
+            //    Console.WriteLine("Unknown joint ID: " + jid);
+
+            //if (period < 0)
+            //{
+            //    Console.WriteLine("Turn period cannot be negative");
+            //    period = 0;
+            //}
+
+            //Console.WriteLine("  " + jid + " timed turn: " + dir + " " + period + "ms");
+            sendCommand(opCode1, opCode2, period);
+        }
+
+        private int GetCancelOpcode(JointID jointId)
+        {
+            switch (jointId)
+            {
+                case (JointID.BASE):
+                    return 0x00;
+                    
+                case(JointID.ELBOW):
+                    return 0x30;
+                case(JointID.WRIST):
+                    return 0x0c;
+                case(JointID.SHOULDER):
+                    return 0xc0;
+                default:
+                    return 0x00;
+            }
+        }
+
+        private int[] GenerateOpCodes(JointID jid, int dir)
+        {
+            int opCode1 = 0x00;
+            int opCode2 = 0x00;
+            
+
+            if (jid == JointID.BASE)
+                opCode2 = (dir == POSITIVE) ? 0x01 : 0x02;
+            else if (jid == JointID.SHOULDER)
+                opCode1 = (dir == POSITIVE) ? 0x80 : 0x40;
+            else if (jid == JointID.ELBOW)
+                opCode1 = (dir == POSITIVE) ? 0x20 : 0x10;
+            else if (jid == JointID.WRIST)
+                opCode1 = (dir == POSITIVE) ? 0x08 : 0x04;
+            else
+                Console.WriteLine("Unknown joint ID: " + jid);
+
+
+            var opCodes = new int[] {opCode1, opCode2};
+            return opCodes;
+
+        }
+    }
+
+
+// end of ArmCommunicator class
 
 }

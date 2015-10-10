@@ -120,12 +120,7 @@ namespace RealArm
             {
                 return ihand.QueryMassCenterWorld();
             }
-            else
-            {
-                throw new HandNotFoundException();
-            }
-
-
+            throw new HandNotFoundException();
         }
 
         public void ActivateGripper()
@@ -215,11 +210,6 @@ namespace RealArm
             var outputX = -(handPosition.x/0.25f)*300f;
             var outputZ = 1.1f*((handPosition.y + 0.15f)/0.3f)*280f;
             var outputY = 280f - (handPosition.z/1.25f)*280f;
-
-            
-
-
-
             return new Coord3D((int)Math.Ceiling(outputX),(int)Math.Ceiling(outputY),(int)Math.Ceiling(outputZ));
         }
 

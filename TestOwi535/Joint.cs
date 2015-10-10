@@ -123,9 +123,48 @@ public class Joint
     }
   }  // end of timedAngleTurn()
 
+    private void compositeAngleTurn(int[] angles)
+    {
+        List<Move> moves = new List<Move>();
+        for (int i = 0; i < angles.Length; i++)
+        {
+           
+            var angle = angles[i];
+            Console.WriteLine("  " + jointID + " angle turn to: " + angle);
+            int offsetAngle = angle - currAngle;     // offset may be +ve or -ve
 
+            if (offsetAngle < 0)
+            {
+                int time = Convert.ToInt32(Math.Round(-offsetAngle / rotRate));
+                if (time < MIN_TIME)
+                    Console.WriteLine("  " + jointID + ": -ve turn time too short (" +
+                                         time + "); ignoring");
+                else
+                {
+                    //armComms.turn(jointID, ArmCommunicator.NEGATIVE, time);
+                    moves.Add(new Move({JointId = jointID,direction = ArmCommunicator.NEGATIVE, time = time});
+                    currAngle = angle;
+                }
+            }
+            else
+            {    // offset is +ve
+                int time = Convert.ToInt32(Math.Round(offsetAngle / rotRate));
+                if (time < MIN_TIME)
+                    Console.WriteLine("  " + jointID + ": +ve turn time too short (" +
+                                         time + "); ignoring");
+                else
+                {
+                    //armComms.turn(jointID, ArmCommunicator.POSITIVE, time);
+                    moves.Add(new Move({JointId = jointID,direction = ArmCommunicator.POSITIVE, time = time});
+                    currAngle = angle;
+                }
+            }
+        }
+        armComms.compositeTurn(moves);
 
-  public void turnToAngle(int angle)
+    }
+
+    public void turnToAngle(int angle)
   /* turn to specified angle (+ve is forwards/right,
      -ve is backwards/left) */
   {  timedAngleTurn( withinLimits(angle) );  }
