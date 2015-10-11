@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using TestOwi535;
 using NUnit.Framework;
@@ -105,5 +106,26 @@ namespace TestOwi535.Tests
         {
             Assert.Fail();
         }
+
+        [Test]
+        public void SimpleMoveToCompositeTest()
+        {
+
+            RobotArm arm = new RobotArm();
+            arm.moveToComposite(new Coord3D(){X = 0, Y = 229, Z = 196});
+            Thread.Sleep(1000);
+            arm.moveToZero();
+        }
+
+        [Test]
+        public void SimpleMoveToCoordTest()
+        {
+
+            RobotArm arm = new RobotArm();
+            arm.moveTo(new Coord3D() { X = 0, Y = 229, Z = 196 });
+            Thread.Sleep(1000);
+            arm.moveToZero();
+        }
+
     }
 }

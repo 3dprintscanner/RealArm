@@ -5,11 +5,11 @@ using System.Text;
 
 namespace TestOwi535
 {
-    class CodedMove
+    public class CodedMove
     {
-        int opCode1 { get; set; }
-        int opCode2 { get; set; }
-        int opCode3 { get; set; }
-        int time { get; set; }
+        public int opCode1 { get; set; }
+        public int opCode2 { get; set; }
+        public int opCode3 { get; set; }
+        public int time { get; set; }
     }
 }

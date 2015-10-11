@@ -59,6 +59,7 @@
   <ItemGroup>
     <Compile Include="ArmCommunicator.cs" />
     <Compile Include="ArmCommunicatorException.cs" />
+    <Compile Include="CodedMove.cs" />
     <Compile Include="Coord3D.cs" />
     <Compile Include="Joint.cs" />
     <Compile Include="JointException.cs" />

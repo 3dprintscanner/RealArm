@@ -236,10 +236,16 @@ namespace TestOwi535
         }
       }  // end of sendCommand()
 
+        private void sendCommand(CodedMove codedMove)
+        {
+            sendControl(codedMove.opCode1,codedMove.opCode2,codedMove.opCode3);
+            wait(codedMove.time);
+        }
 
 
 
-      private void sendControl(int opCode1, int opCode2, int opCode3)
+
+        private void sendControl(int opCode1, int opCode2, int opCode3)
       // send a USB control transfer
       {
     /*
@@ -429,80 +435,87 @@ namespace TestOwi535
         Console.WriteLine("Unknown command: " + ch);
         }  // end of doArmOp() 
 
-        public void compositeTurn(List<Move> moves)
+        public void CompositeTurn(List<Move> moves)
         {
             // For each move, order the moves by time, work out the gaps between the move times and create a scheduler to stop the moves
             // or create a thread which calls a function after a certain amount of time which sends the stop byte for the given joint
-
-
-           //moves.Sort((x,y)=>x.time.CompareTo(y.time));
-           
-            
-
-            int[] timeList = new int[]{};
-            for (int i = 0; i < moves.Count; i++)
+            var moveCodes = ProcessedMovesList(moves);
+            foreach (var move in moveCodes)
             {
-                timeList[i] = moves[i].time;
-            }           
-
-            // split the generation of movelist and timelist into another method, use this method just for sending the codes to the arm
+                sendCommand(move);
+            }
 
             //sendCommand(opCode1, opCode2, period);
         }
 
-        public List<int[]> ProcessedMovesList(List<Move> moves)
+        public List<CodedMove> ProcessedMovesList(List<Move> moves)
         {
             IOrderedEnumerable<Move> sortedMoves = moves.OrderBy(x => x.time);
 
             // create a set of all the moves required
-            List<int[]> opCodeMoves = new List<int[]>();
+            List<CodedMove> opCodedMoves = new List<CodedMove>();
 
-            int[] movelist = new int[sortedMoves.Count()+1];
-
+            
             for (int i = 0; i < sortedMoves.Count(); i++)
             {
-                var opCode = GenerateOpCodes(sortedMoves.ElementAt(i).JointId, sortedMoves.ElementAt(i).direction);
-                movelist[i] += opCode[0];
+                var opCodes = GenerateOpCodes(sortedMoves.ElementAt(i).JointId, sortedMoves.ElementAt(i).direction,sortedMoves.ElementAt(i).time);
+                var moveTime = (i == 0) ? sortedMoves.ElementAt(i).time : sortedMoves.ElementAt(i).time - sortedMoves.ElementAt(i -1).time;
+                var codedMove = new CodedMove()
+                {
+                    opCode1 = opCodes[0],
+                    opCode2 = opCodes[1],
+                    opCode3 = 0x00,
+                    time = moveTime
+                };
+                
                 for (int j = i + 1; j < sortedMoves.Count(); j++)
                 {
                     // get the opcodes of the rest of the sortedMoves
-                    var opcode = GenerateOpCodes(sortedMoves.ElementAt(j).JointId, sortedMoves.ElementAt(j).direction);
-                    movelist[i] += opcode[0];                    
+                    var opcode = GenerateOpCodes(sortedMoves.ElementAt(j).JointId, sortedMoves.ElementAt(j).direction,sortedMoves.ElementAt(j).time);
+                    codedMove.opCode1 += opcode[0];
+                    codedMove.opCode2 += opcode[1];
                 }
-                if (i > 0) movelist[i] += GetCancelOpcode(sortedMoves.ElementAt(i-1).JointId);
-                
-                // the first byte value is the sum of the opcodes for the moves at a time
-                // this is the sum of the opcodes for 
+            
+                if (i > 0)
+                {
+                    codedMove.opCode1 += GetCancelOpcode(sortedMoves.ElementAt(i - 1).JointId)[0];
+                    codedMove.opCode2 += GetCancelOpcode(sortedMoves.ElementAt(i - 1).JointId)[1];
+                }
 
+                // the first byte value is the sum of the opcodes for the moves at a time
+                opCodedMoves.Add(codedMove);
             }
-            movelist[sortedMoves.Count()] = 0x00;
-            opCodeMoves.Add(movelist);
-            return opCodeMoves;
+            var finalTime = 10;
+            var finalMove = new CodedMove(){opCode1 = 0x00, opCode2 = 0x00, opCode3 = 0x00, time = finalTime};
+            opCodedMoves.Add(finalMove);
+            
+            return opCodedMoves;
 
         }
 
-        private int GetCancelOpcode(JointID jointId)
+        private int[] GetCancelOpcode(JointID jointId)
         {
             switch (jointId)
             {
                 case (JointID.BASE):
-                    return 0x00;                   
+                    return new int[]{0x00,0x03};                   
                 case(JointID.ELBOW):
-                    return 0x30;
+                    return new int[]{0x30,0x00};
                 case(JointID.WRIST):
-                    return 0x0c;
+                    return new int[]{0x0c,0x00};
                 case(JointID.SHOULDER):
-                    return 0xc0;
+                    return new int[]{0xc0,0x00};
                 default:
-                    return 0x00;
+                    return new int[]{0x00,0x00};
             }
         }
 
-        private int[] GenerateOpCodes(JointID jid, int dir)
+        private int[] GenerateOpCodes(JointID jid, int dir, int time)
         {
             int opCode1 = 0x00;
             int opCode2 = 0x00;
             
+            if(time == 0) return new int[]{0x00, 0x00};
 
             if (jid == JointID.BASE)
                 opCode2 = (dir == POSITIVE) ? 0x01 : 0x02;

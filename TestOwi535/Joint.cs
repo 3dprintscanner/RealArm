@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Permissions;
 using System.Text;
 
 namespace TestOwi535
@@ -30,7 +31,7 @@ public class Joint
   private const int MIN_TIME = 200;   // ms
              // don't move if time is less than MIN_TIME
 
-  private JointID jointID;
+  public JointID jointID;
   private ArmCommunicator armComms;
 
   // data read in from joint info file
@@ -93,6 +94,27 @@ public class Joint
     return angle;
   }  // end of withinLimits()
 
+  private int withinCompositeLimits(int thisangle, JointID jointiD)
+  // adjust angle if outside limits
+  {
+      var jointID = jointiD;
+      var angle = thisangle;
+          if (angle >= posLimit)
+          {
+              Console.WriteLine("  " + jointID + ": Angle (" + angle +
+                                        ") exceeds +ve limit; turning to limit only");
+              angle = posLimit - 1;
+          }
+          else if (angle <= negLimit)
+          {
+              Console.WriteLine("  " + jointID + ": Angle (" + angle +
+                                           ") exceeds -ve limit; turning to limit only");
+              angle = negLimit + 1;
+          }
+      return angle;
+
+  }  
+
 
 
   private void timedAngleTurn(int angle)
@@ -123,13 +145,18 @@ public class Joint
     }
   }  // end of timedAngleTurn()
 
-    private void compositeAngleTurn(int[] angles)
+    public Move compositeAngleTurn(int angle, JointID jointId)
     {
-        List<Move> moves = new List<Move>();
-        for (int i = 0; i < angles.Length; i++)
-        {
-           
-            var angle = angles[i];
+        var thisJointId = jointId;
+        return compositeLimitedAngleTurn(withinCompositeLimits(angle, thisJointId),thisJointId); 
+    }
+    
+    private Move compositeLimitedAngleTurn(int thisAngle, JointID jointId)
+    {
+        var jointID = jointId;
+        Move move = new Move();
+
+        var angle = thisAngle;
             Console.WriteLine("  " + jointID + " angle turn to: " + angle);
             int offsetAngle = angle - currAngle;     // offset may be +ve or -ve
 
@@ -142,7 +169,10 @@ public class Joint
                 else
                 {
                     //armComms.turn(jointID, ArmCommunicator.NEGATIVE, time);
-                    moves.Add(new Move(){JointId = jointID , direction = ArmCommunicator.NEGATIVE , time = time});
+                    //moves.Add(new Move(){JointId = jointID , direction = ArmCommunicator.NEGATIVE , time = time});
+                    move.JointId = jointID;
+                    move.direction = ArmCommunicator.NEGATIVE;
+                    move.time = time;
                     currAngle = angle;
                 }
             }
@@ -155,13 +185,20 @@ public class Joint
                 else
                 {
                     //armComms.turn(jointID, ArmCommunicator.POSITIVE, time);
-                    moves.Add(new Move(){JointId = jointID,direction = ArmCommunicator.POSITIVE, time = time});
+                    //moves.Add(new Move(){JointId = jointID,direction = ArmCommunicator.POSITIVE, time = time});
+                    move.JointId = jointID;
+                    move.direction = ArmCommunicator.POSITIVE;
+                    move.time = time;
                     currAngle = angle;
                 }
             }
-        }
-        armComms.compositeTurn(moves);
+        return move;
+        
+    }
 
+    public void DoTurn(List<Move> moveList)
+    {
+        armComms.CompositeTurn(moveList);
     }
 
     public void turnToAngle(int angle)

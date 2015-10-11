@@ -150,7 +150,6 @@ namespace RealArm
 
         public override void DeactivateActuator()
         {
-            _robotArm.moveToZero();
             _robotArm.setLight(false);
             _robotArm.close();
             _robotArm = null;
@@ -178,7 +177,7 @@ namespace RealArm
             {
                 var handPosition = GetHandPXCMPoint32();
                 var transformPosition = GetTransformPosition(handPosition);
-                await Task.Run(() =>_robotArm.moveTo(transformPosition));
+                await Task.Run(() =>_robotArm.moveToComposite(transformPosition));
             }
             catch (HandNotFoundException)
             {

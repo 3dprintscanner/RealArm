@@ -53,7 +53,6 @@ public class RobotArm
     armComms.close();
   }  // end of close()
 	
-
   public void moveToZero()
   { 
     Console.WriteLine("Moving to zero...");
@@ -352,6 +351,46 @@ public class RobotArm
   }  // end of moveInLine()
 
 
+    public bool moveToComposite(Coord3D pt)
+    {
+        { return moveToComposite(pt.X, pt.Y,pt.Z); }
+    }
+
+    public bool moveToComposite(int x, int y, int z)
+    {
+        Console.WriteLine("-----");
+        Console.WriteLine("Moving to (" + x + ", " + y + ", " + z + ")...");
+
+        int[] angles = calcIK(x, y, z);
+        if (angles == null)
+            return false;
+
+        if (!withinRanges(angles))
+        {
+            Console.WriteLine("Move Cancelled");
+            return false;
+        }
+        else
+        {
+            
+            // replace with a turntoCompositeAngle(movelist) method instead of the for loop
+
+            // the move is calculated per joint in the for loop, 
+            // the move can be passed back to create the moves object..
+            List<Move> movesList = new List<Move>();
+            for (int i = 0; i < joints.Length; i++)
+            {
+                var move = joints[i].compositeAngleTurn(angles[i], joints[i].jointID);
+                movesList.Add(move);
+            }
+           joints[0].DoTurn(movesList);
+            return true;
+            
+            //for (int i = 0; i < angles.Length; i++)
+            //    joints[i].turnToAngle(angles[i]);
+            //return true;
+        }
+    }
 }  // end of RobotArm class
 
 }
