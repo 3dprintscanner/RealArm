@@ -64,6 +64,7 @@
     <Compile Include="JointException.cs" />
     <Compile Include="JointID.cs" />
     <Compile Include="MainClass.cs" />
+    <Compile Include="Move.cs" />
     <Compile Include="RobotArm.cs" />
   </ItemGroup>
   <ItemGroup>

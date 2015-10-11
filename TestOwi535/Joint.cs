@@ -142,7 +142,7 @@ public class Joint
                 else
                 {
                     //armComms.turn(jointID, ArmCommunicator.NEGATIVE, time);
-                    moves.Add(new Move({JointId = jointID,direction = ArmCommunicator.NEGATIVE, time = time});
+                    moves.Add(new Move(){JointId = jointID , direction = ArmCommunicator.NEGATIVE , time = time});
                     currAngle = angle;
                 }
             }
@@ -155,7 +155,7 @@ public class Joint
                 else
                 {
                     //armComms.turn(jointID, ArmCommunicator.POSITIVE, time);
-                    moves.Add(new Move({JointId = jointID,direction = ArmCommunicator.POSITIVE, time = time});
+                    moves.Add(new Move(){JointId = jointID,direction = ArmCommunicator.POSITIVE, time = time});
                     currAngle = angle;
                 }
             }

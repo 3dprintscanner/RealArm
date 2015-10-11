@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RealArmFrontEnd", "RealArmF
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestOwi535", "TestOwi535\TestOwi535.csproj", "{8677C131-8C1B-4CB8-B940-9081F0FFAC30}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestOwi535Tests", "TestOwi535Tests\TestOwi535Tests.csproj", "{B86A6252-EE9F-4113-8248-9E49A391AD39}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +51,16 @@ Global
 		{8677C131-8C1B-4CB8-B940-9081F0FFAC30}.Release|Mixed Platforms.Build.0 = Release|x86
 		{8677C131-8C1B-4CB8-B940-9081F0FFAC30}.Release|x86.ActiveCfg = Release|x86
 		{8677C131-8C1B-4CB8-B940-9081F0FFAC30}.Release|x86.Build.0 = Release|x86
+		{B86A6252-EE9F-4113-8248-9E49A391AD39}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B86A6252-EE9F-4113-8248-9E49A391AD39}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B86A6252-EE9F-4113-8248-9E49A391AD39}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{B86A6252-EE9F-4113-8248-9E49A391AD39}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{B86A6252-EE9F-4113-8248-9E49A391AD39}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B86A6252-EE9F-4113-8248-9E49A391AD39}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B86A6252-EE9F-4113-8248-9E49A391AD39}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B86A6252-EE9F-4113-8248-9E49A391AD39}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{B86A6252-EE9F-4113-8248-9E49A391AD39}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{B86A6252-EE9F-4113-8248-9E49A391AD39}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

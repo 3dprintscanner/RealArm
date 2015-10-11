@@ -436,59 +436,49 @@ namespace TestOwi535
 
 
            //moves.Sort((x,y)=>x.time.CompareTo(y.time));
-            moves.OrderBy(x => x.time);
-
-           // create a set of all the moves required
-            List<int[]> opCodeMoves = new List<int[]>();
-
-            int[] movelist = new int[]{};
-
-            for (int i = 0; i < moves.Count; i++)
-            {
-                var opCode = GenerateOpCodes(moves[i].JointId,moves[i].direction);
-                movelist[i] += opCode[0];
-                for (int j = i+1; j < moves.Count; j++)
-                {
-                    // get the opcodes of the rest of the moves
-                    var opcode = GenerateOpCodes(moves[j].JointId, moves[j].direction);
-                    movelist[i] += opcode[0];
-                    movelist[j] = GetCancelOpcode(moves[i].JointId);
-                }
-                // the first byte value is the sum of the opcodes for the moves at a time
-                // this is the sum of the opcodes for 
-            }
+           
             
 
             int[] timeList = new int[]{};
             for (int i = 0; i < moves.Count; i++)
             {
                 timeList[i] = moves[i].time;
+            }           
+
+            // split the generation of movelist and timelist into another method, use this method just for sending the codes to the arm
+
+            //sendCommand(opCode1, opCode2, period);
+        }
+
+        public List<int[]> ProcessedMovesList(List<Move> moves)
+        {
+            IOrderedEnumerable<Move> sortedMoves = moves.OrderBy(x => x.time);
+
+            // create a set of all the moves required
+            List<int[]> opCodeMoves = new List<int[]>();
+
+            int[] movelist = new int[sortedMoves.Count()+1];
+
+            for (int i = 0; i < sortedMoves.Count(); i++)
+            {
+                var opCode = GenerateOpCodes(sortedMoves.ElementAt(i).JointId, sortedMoves.ElementAt(i).direction);
+                movelist[i] += opCode[0];
+                for (int j = i + 1; j < sortedMoves.Count(); j++)
+                {
+                    // get the opcodes of the rest of the sortedMoves
+                    var opcode = GenerateOpCodes(sortedMoves.ElementAt(j).JointId, sortedMoves.ElementAt(j).direction);
+                    movelist[i] += opcode[0];                    
+                }
+                if (i > 0) movelist[i] += GetCancelOpcode(sortedMoves.ElementAt(i-1).JointId);
+                
+                // the first byte value is the sum of the opcodes for the moves at a time
+                // this is the sum of the opcodes for 
+
             }
+            movelist[sortedMoves.Count()] = 0x00;
+            opCodeMoves.Add(movelist);
+            return opCodeMoves;
 
-            
-            
-            //int opCode1 = 0x00;
-            //int opCode2 = 0x00;
-
-            //if (jid == JointID.BASE)
-            //    opCode2 = (dir == POSITIVE) ? 0x01 : 0x02;
-            //else if (jid == JointID.SHOULDER)
-            //    opCode1 = (dir == POSITIVE) ? 0x80 : 0x40;
-            //else if (jid == JointID.ELBOW)
-            //    opCode1 = (dir == POSITIVE) ? 0x20 : 0x10;
-            //else if (jid == JointID.WRIST)
-            //    opCode1 = (dir == POSITIVE) ? 0x08 : 0x04;
-            //else
-            //    Console.WriteLine("Unknown joint ID: " + jid);
-
-            //if (period < 0)
-            //{
-            //    Console.WriteLine("Turn period cannot be negative");
-            //    period = 0;
-            //}
-
-            //Console.WriteLine("  " + jid + " timed turn: " + dir + " " + period + "ms");
-            sendCommand(opCode1, opCode2, period);
         }
 
         private int GetCancelOpcode(JointID jointId)
@@ -496,8 +486,7 @@ namespace TestOwi535
             switch (jointId)
             {
                 case (JointID.BASE):
-                    return 0x00;
-                    
+                    return 0x00;                   
                 case(JointID.ELBOW):
                     return 0x30;
                 case(JointID.WRIST):
