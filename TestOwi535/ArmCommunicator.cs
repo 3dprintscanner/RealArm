@@ -238,8 +238,11 @@ namespace TestOwi535
 
         private void sendCommand(CodedMove codedMove)
         {
-            sendControl(codedMove.opCode1,codedMove.opCode2,codedMove.opCode3);
-            wait(codedMove.time);
+            if(dev != null)
+            {
+                sendControl(codedMove.opCode1, codedMove.opCode2, codedMove.opCode3);
+                wait(codedMove.time);
+            }
         }
 
 
